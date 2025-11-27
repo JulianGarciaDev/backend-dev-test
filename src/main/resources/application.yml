@@ -1,0 +1,27 @@
+server:
+    port: 5000
+
+rest-client:
+  connect-timeout: 5s
+  read-timeout: 60s
+  product-base-url: http://localhost:3001
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      similarProducts:
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+      productDetails:
+        slidingWindowSize: 50
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  retry:
+    instances:
+      similarProductsRetry:
+        maxAttempts: 2
+        waitDuration: 200ms
+      productDetailsRetry:
+        maxAttempts: 3
+        waitDuration: 300ms
