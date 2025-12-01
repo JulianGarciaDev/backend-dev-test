@@ -93,6 +93,32 @@ Returns a list of similar products with their complete details.
 - **Rate Limiting**: Implement rate limiting to prevent API abuse and protect external services
 - **Security**: Implement authentication and authorization (OAuth2, JWT)
 - **MapStruct**: Replace manual mappers with MapStruct for compile-time safe and efficient object mapping
+- **Fully Reactive Architecture**: Migrate to end-to-end reactive programming with Project Reactor, eliminating Virtual Threads and `.block()` calls for maximum efficiency (with the trade-offs mentioned in Key Design Decisions)
+
+## Key Design Decision
+
+### Hybrid Reactive-Synchronous Architecture
+
+The application uses a **hybrid approach** combining reactive infrastructure with synchronous business logic:
+
+- **Infrastructure Layer**: Uses Spring WebFlux's reactive `WebClient` for non-blocking HTTP calls
+- **Application/Domain Layers**: Maintains synchronous, imperative code for business logic
+- **Concurrency**: Java 21 Virtual Threads handle concurrent operations via `CompletableFuture`
+
+**Why this approach?**
+
+- **Layer Decoupling**: Keeps domain and application layers independent from reactive infrastructure concerns (Reactor's `Mono`/`Flux`)
+- **Testability**: Synchronous business logic is easier to test without complex reactive test setups
+- **Maintainability**: Team members can understand and modify business logic without deep reactive programming knowledge
+- **Performance**: Virtual Threads provide excellent concurrency without thread-blocking overhead
+
+**Trade-off**: A fully reactive architecture (eliminating `.block()` and Virtual Threads) would theoretically offer better resource utilization and backpressure handling, but at the cost of:
+- Tighter coupling between layers
+- Increased complexity in business logic
+- Steeper learning curve for the team
+- More complex testing scenarios
+
+This hybrid approach prioritizes **code clarity and maintainability** while still achieving good performance through Virtual Threads.
 
 ## Design Highlights
 
